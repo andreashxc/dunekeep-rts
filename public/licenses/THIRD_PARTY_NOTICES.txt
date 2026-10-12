@@ -1,0 +1,3 @@
+Three.js — MIT. See Three.js-LICENSE.txt.
+Manrope — SIL OFL 1.1. See ../assets/fonts/Manrope-OFL.txt.
+Original project authorship: Andrew Manuilov (andreashxc). See NOTICE and LICENSE.

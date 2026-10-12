@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="UTF-8"><title>Building portrait renderer</title></head>
+<body style="margin:0;background:transparent"><script type="module">
+import * as THREE from 'three';
+import { createWorldBuilding } from '/src/render/world/WorldBuilding.ts';
+import { disposeEntity } from '/src/render/objects/EntityDisposal.ts';
+const kind = new URLSearchParams(location.search).get('kind') || 'siegeWorkshop';
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(320, 256); renderer.setPixelRatio(2);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xd6e7ee, 0xa69a86, 1.75));
+const sun = new THREE.DirectionalLight(0xffedcf, 3.0);
+sun.position.set(-3, 6, 4); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -2; sun.shadow.camera.right = 2;
+sun.shadow.camera.top = 4; sun.shadow.camera.bottom = -4; sun.shadow.normalBias = 0.008;
+sun.shadow.camera.left = -4; sun.shadow.camera.right = 4;
+scene.add(sun);
+let model;
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: 0.18 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -0.005; floor.receiveShadow = true; scene.add(floor);
+const camera = new THREE.OrthographicCamera(-1.25, 1.25, 1, -1, 0.1, 60);
+document.body.append(renderer.domElement);
+window.renderPortrait = (buildingKind) => {
+  if (model) disposeEntity(model);
+  model = createWorldBuilding(buildingKind);
+  if (!model) throw new Error(`Unknown building ${buildingKind}`);
+  scene.add(model);
+  const bounds = new THREE.Box3().setFromObject(model, true);
+  const centre = bounds.getCenter(new THREE.Vector3());
+  camera.position.copy(centre).add(new THREE.Vector3(3.5, 2.7, 4.5).normalize().multiplyScalar(12));
+  camera.lookAt(centre);
+  camera.updateMatrixWorld(true);
+  const viewBounds = new THREE.Box3();
+  for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+    viewBounds.expandByPoint(new THREE.Vector3(x,y,z).applyMatrix4(camera.matrixWorldInverse));
+  }
+  const size = viewBounds.getSize(new THREE.Vector3());
+  const halfHeight = Math.max(size.y, size.x / 1.25) * 0.57;
+  camera.left = -halfHeight * 1.25; camera.right = halfHeight * 1.25;
+  camera.top = halfHeight; camera.bottom = -halfHeight;
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+  return { kind: buildingKind, height: bounds.max.y, triangles: renderer.info.render.triangles };
+};
+window.renderPortrait(kind);
+window.portraitReady = true;
+window.exportPortrait = () => renderer.domElement.toDataURL('image/png');
+</script></body></html>
