@@ -1,5 +1,7 @@
 # Dunekeep — Fortress of the Sands
 
+**[Play online](https://andreashxc.github.io/dunekeep-rts/)** — runs in your browser; no installation required.
+
 A browser strategy game about building a desert settlement and keeping it alive through a six-mission campaign. Grow the economy, supply your garrison, connect walls and gates, and defend the keep.
 
 ![Dunekeep's actual campaign scene and pause interface](docs/images/gameplay-desktop.png)
@@ -44,7 +46,7 @@ npm run build
 npm run preview
 ```
 
-The servers bind to `127.0.0.1` by default. Vite produces a static `dist/` site with a relative asset base. An application backend or user account is not required.
+The servers bind to `127.0.0.1` by default. Vite produces a static `dist/` site with the project-specific Pages base path. An application backend or user account is not required.
 
 ## Getting started
 
@@ -83,3 +85,7 @@ Created by **Andrew Manuilov** ([andreashxc](https://github.com/andreashxc)). Th
 Original project: [andreashxc/dunekeep-rts](https://github.com/andreashxc/dunekeep-rts).
 
 Original work is licensed under [Apache-2.0](LICENSE). Retain the applicable attribution and [NOTICE](NOTICE) when distributing it. Third-party components retain their own licenses. See [AUTHORS](AUTHORS.md), [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) and [preparation changes](MODIFICATIONS.md).
+
+## GitHub Pages
+
+The Build, test and deploy workflow verifies the source, packages only dist/ and deploys it to GitHub Pages on pushes to main. Pull requests run checks without deployment. Static assets, fonts and image portraits use the project base path. No custom domain is configured by this project.
